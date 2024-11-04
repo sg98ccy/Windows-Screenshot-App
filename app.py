@@ -16,8 +16,8 @@ class ScreenshotTool(QWidget):
 
     def initUI(self):
         self.setWindowTitle('Screenshot Selector')
-        # Set the icon for the PyQt window
-        self.setWindowIcon(QIcon(r"C:\Users\sg98c\Local apps (JCH)\Screenshot app\favicon.ico"))
+        # Set the icon for the PyQt window (icon located in the root directory)
+        self.setWindowIcon(QIcon("./favicon.ico"))
         
         # Labels with units in pixels
         width_label = QLabel('Width (px):')
@@ -144,8 +144,8 @@ class ScreenshotTool(QWidget):
         self.screenshot_selector.showFullScreen()
 
     def save_screenshot(self, pixmap):
-        # Save to file
-        save_path = r"C:\Users\sg98c\OneDrive\Desktop\Screenshot Outputs"
+        # Save to file in a 'Screenshot Outputs' folder in the current directory
+        save_path = os.path.join(os.getcwd(), "Screenshot Outputs")
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         
@@ -228,13 +228,13 @@ class ScreenshotSelector(QWidget):
         overlay = QColor(0, 0, 0, 150)
         painter.fillRect(self.rect(), overlay)
         
-        # Draw the translucent box
+        # Draw the translucent selection box
         cursor_pos = self.mapFromGlobal(QCursor.pos())
         box_rect = QRect(cursor_pos.x() - self.width // 2, 
                          cursor_pos.y() - self.height // 2, 
                          self.width, self.height)
         
-        # Draw translucent fill
+        # Draw translucent fill inside the box
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.fillRect(box_rect, QColor(255, 255, 255, 50))
         
@@ -246,6 +246,42 @@ class ScreenshotSelector(QWidget):
         painter.setClipRect(box_rect)
         painter.drawPixmap(self.rect(), self.original_pixmap)
         painter.setClipRect(self.rect())
+
+        # Draw grid lines and center crosshair lines
+        grid_color = QColor(255, 255, 255, 100)  # Semi-transparent white for grid
+        painter.setPen(QPen(grid_color, 1, Qt.SolidLine))
+        
+        # Number of sections (subdivisions) in each direction
+        sections_x = 4
+        sections_y = 4
+
+        # Draw vertical grid lines
+        section_width = self.width // sections_x
+        for i in range(1, sections_x):
+            x = box_rect.left() + i * section_width
+            painter.drawLine(x, box_rect.top(), x, box_rect.bottom())
+
+        # Draw horizontal grid lines
+        section_height = self.height // sections_y
+        for i in range(1, sections_y):
+            y = box_rect.top() + i * section_height
+            painter.drawLine(box_rect.left(), y, box_rect.right(), y)
+
+        # Draw center crosshair lines
+        crosshair_color = QColor(255, 255, 255, 150)  # Slightly more visible for center crosshair
+        painter.setPen(QPen(crosshair_color, 1, Qt.SolidLine))
+        
+        # Vertical line for the center crosshair
+        painter.drawLine(
+            box_rect.center().x(), box_rect.top(),
+            box_rect.center().x(), box_rect.bottom()
+        )
+        
+        # Horizontal line for the center crosshair
+        painter.drawLine(
+            box_rect.left(), box_rect.center().y(),
+            box_rect.right(), box_rect.center().y()
+        )
 
     def mousePressEvent(self, event):
         self.take_screenshot()
@@ -267,6 +303,8 @@ class ScreenshotSelector(QWidget):
         elif event.key() == Qt.Key_Escape:
             self.cancelled.emit()
             self.close()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
