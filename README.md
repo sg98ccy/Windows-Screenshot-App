@@ -1,5 +1,7 @@
 # Screenshot Selector
 
+![Screenshot Selector Demo](./Screenshot%20Selector.gif)
+
 **Screenshot Selector** is a simple and customizable Python-based tool that allows users to capture screenshots with specific dimensions and aspect ratios. The app provides an interactive interface to select width and height, lock aspect ratios, and automatically scale dimensions with a slider.
 
 ## Features
