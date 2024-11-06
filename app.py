@@ -15,9 +15,22 @@ class ScreenshotTool(QWidget):
         self.screenshot = None
 
     def initUI(self):
-        self.setWindowTitle('Screenshot Selector')
-        # Set the icon for the PyQt window (icon located in the root directory)
-        self.setWindowIcon(QIcon("./favicon.ico"))
+        # Check for PyInstaller's runtime environment
+        if hasattr(sys, '_MEIPASS'):
+            icon_path = os.path.join(sys._MEIPASS, "favicon.ico")  # Use bundled path
+        else:
+            icon_path = "./favicon.ico"  # Path for development environment
+
+        self.setWindowIcon(QIcon(icon_path))  # Set the icon using the resolved path
+
+        # Continue with the rest of your UI setup
+        self.setWindowTitle('Screenshot Selector')# Check for PyInstaller's runtime environment
+        if hasattr(sys, '_MEIPASS'):
+            icon_path = os.path.join(sys._MEIPASS, "favicon.ico")  # Use bundled path
+        else:
+            icon_path = "./favicon.ico"  # Path for development environment
+
+        self.setWindowIcon(QIcon(icon_path))  # Set the icon using the resolved path
         
         # Labels with units in pixels
         width_label = QLabel('Width (px):')
